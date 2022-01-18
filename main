@@ -1,0 +1,57 @@
+from tkinter import *
+import pandas
+import random
+import time
+
+BACKGROUND_COLOR = "#B1DDC6"
+
+# ------------------Setup---------------------#
+df = pandas.read_csv("data/french_words.csv")
+data = df.to_dict(orient="records")
+print(data)
+current_card = {}
+
+
+def show_next():
+    global current_card
+    current_card = random.choice(data)
+    x_button.config(state="disabled")
+    right_button.config(state="disabled")
+    canvas.itemconfig(cv_title, text="French", fill="black")
+    canvas.itemconfig(cv_text, text=current_card["French"], fill="black")
+    canvas.itemconfig(cv_image, image=card_front)
+    window.after(3000, func=flip_card)
+
+
+def flip_card():
+    canvas.itemconfig(cv_image, image=card_back)
+    canvas.itemconfig(cv_title, text="English", fill="white")
+    canvas.itemconfig(cv_text, text=current_card["English"], fill="white")
+    x_button.config(state="active")
+    right_button.config(state="active")
+
+window = Tk()
+window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
+
+
+
+# -------------------UI-----------------------#
+card_front = PhotoImage(file="images/card_front.png")
+card_back = PhotoImage(file="images/card_back.png")
+
+canvas = Canvas(width=800, height=600, bg=BACKGROUND_COLOR, highlightthickness=0)
+cv_image = canvas.create_image((400, 300), image=card_front)
+cv_text = canvas.create_text((400, 300), text="Word", font=("arial", 45, "bold"))
+cv_title = canvas.create_text((400, 200), text="Title", font=("arial", 30))
+canvas.grid(row=0, column=0, columnspan=2)
+
+x_image = PhotoImage(file="images/wrong.png")
+x_button = Button(text="Click ME", bg=BACKGROUND_COLOR, image=x_image, command=show_next)
+x_button.grid(row=1, column=0)
+
+right_image = PhotoImage(file="images/right.png")
+right_button = Button(text="Click ME", bg=BACKGROUND_COLOR, image=right_image, command=show_next)
+right_button.grid(row=1, column=1)
+
+show_next()
+window.mainloop()
